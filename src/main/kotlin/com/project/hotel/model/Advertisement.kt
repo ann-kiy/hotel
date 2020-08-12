@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class Advertisement (
         @Id
         val id: ObjectId = ObjectId.get(),
-        var idUser:String,
+        var idUser:User,
         var createDate:LocalDateTime,
         var typeAnimal:TypeAnimal?=null,
         var dateStart:LocalDateTime,

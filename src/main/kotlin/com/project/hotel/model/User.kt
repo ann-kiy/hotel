@@ -21,9 +21,7 @@ data class User(
         var active:Boolean?=false,
         var activateCode: String?=null,
         var lastVisit:LocalDateTime?=null,
-        var locale:Locale?=null
+        var locale:Locale?=null,
+        var comments:List<Comment>?=null
 )
-// {
-//        @Transient
-//        val SEQUENCE_NAME:String = "users_sequence";
-//}
+

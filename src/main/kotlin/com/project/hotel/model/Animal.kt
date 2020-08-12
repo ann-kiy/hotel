@@ -16,7 +16,8 @@ data class Animal (
         var img:String,
         var info:String,
         var rating:Float?=null,
-        var state:Boolean?=true
+        var state:Boolean?=true,
+        var comments:List<Comment>?=null
 )
 enum class Sex{m,f}
 @Document
