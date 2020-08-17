@@ -1,17 +1,18 @@
-package com.project.hotel.model
+package com.project.hotel.model.animals
 
+import com.project.hotel.model.Comment
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document
 data class Animal (
         @Id
         val id: ObjectId = ObjectId.get(),
-        var idUser:String,
+        var userId:String,
         var name:String,
-        var sex:Sex,
-        var type:TypeAnimal,
+        var sex: Sex,
+        var typeId:String,
+        var breedId:String,
         var age:Byte,
         var img:String,
         var info:String,
@@ -20,8 +21,4 @@ data class Animal (
         var comments:List<Comment>?=null
 )
 enum class Sex{m,f}
-@Document
-data class TypeAnimal(
-       var type:String,
-       var breed:String?=null
-)
+
