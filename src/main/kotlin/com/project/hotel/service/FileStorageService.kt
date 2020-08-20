@@ -12,19 +12,20 @@ import java.util.*
 
 @Service
 class FileStorageService {
-    val  rootLocation = Paths.get("upload")
-    fun store(file:FilePart):String{
+    val rootLocation = Paths.get("upload")
+    fun store(file: FilePart): String {
         val resultFileName = UUID.randomUUID().toString() + "." + file.filename()
         file.transferTo(File(rootLocation.resolve(resultFileName).toString()))
         return resultFileName
     }
+
     fun loadFile(filename: String): Resource {
         val file = rootLocation.resolve(filename)
         val resource = UrlResource(file.toUri())
 
-        if(resource.exists() || resource.isReadable) {
+        if (resource.exists() || resource.isReadable) {
             return resource
-        }else{
+        } else {
             throw RuntimeException("FAIL!")
         }
     }

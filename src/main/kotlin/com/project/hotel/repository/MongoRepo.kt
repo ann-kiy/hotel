@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
-interface MongoRepo<T>: ReactiveMongoRepository<T, String>  {
+interface MongoRepo<T> : ReactiveMongoRepository<T, String> {
 }

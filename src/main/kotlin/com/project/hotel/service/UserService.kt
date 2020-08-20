@@ -1,5 +1,6 @@
 package com.project.hotel.service
 
+import com.project.hotel.model.dto.NewUser
 import com.project.hotel.model.users.Role
 import com.project.hotel.model.users.User
 import com.project.hotel.repository.UserRepo
@@ -8,49 +9,57 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class UserService(private val userRepo:UserRepo, private val fileStorageService: FileStorageService) {
+class UserService(private val userRepo: UserRepo, private val fileStorageService: FileStorageService) {
 
-    suspend fun addUser(user: User): User?{
-        if (userRepo.findByEmail(user.email).awaitFirstOrNull()!=null) return null
-        user.roles= Collections.singleton(Role.user)
-        user.lastVisit= LocalDateTime.now()
-        user.activateCode=UUID.randomUUID().toString()
-
-        userRepo.save(user).awaitFirst()
-        return user
-    }
-    suspend fun addFile(user:User, file: FilePart):User{
-        user.img=fileStorageService.store(file)
-        userRepo.save(user).awaitFirst()
-        return user
-    }
-    suspend fun updateUser(user:User, userId:String):User?{
-        val userFDB=userRepo.findById(userId).awaitFirstOrNull()
-        val isEmailChange=(userFDB?.email != user.email) && user.email.isNotEmpty()
-        userFDB?.email=user.email
-        userFDB?.locale=user.locale
-        userFDB?.phone=user.phone
-
-        if(isEmailChange){
-            userFDB?.email=user.email
-            userFDB?.activateCode=UUID.randomUUID().toString()
+    suspend fun addUser(userDTO: NewUser): User? {
+        return userRepo.findByEmail(userDTO.email).awaitFirstOrNull()?.let {
+            val user = userDTO.toUser()
+            user.roles = Collections.singleton(Role.USER)
+            user.activateCode = UUID.randomUUID().toString()
             //sendMessage(userFDB)
+            userRepo.save(user).awaitFirst()
         }
-        return userFDB
     }
-    suspend fun activateUser(code:String):User?{
-        val user=userRepo.findByActivateCode(code).awaitFirstOrNull()
-        if(user!=null){
-            user.activateCode= String()
-            user.active=true
-            userRepo.save(user)
+
+    suspend fun addFile(user: User, file: FilePart) {
+        user.img = fileStorageService.store(file)
+        userRepo.save(user).awaitFirst()
+    }
+
+    suspend fun updateUser(userDTO: User, userId: String): User? {
+        return userRepo.findById(userId).awaitFirstOrNull()
+                ?.let {
+                    it.name = userDTO.name
+                    it.locale = userDTO.locale
+                    it.phone = userDTO.phone
+                    val isEmailChange = (it.email != userDTO.email) && userDTO.email.isNotEmpty()
+                    if (isEmailChange) {
+                        //sendMessage(userFDB)
+                        userRepo.save(it.copy(email = userDTO.email, activateCode = UUID.randomUUID().toString(), active = false)).awaitFirst()
+                    }
+                    userRepo.save(it).awaitFirst()
+                }
+    }
+
+    suspend fun activateUser(code: String): User? {
+        return userRepo.findByActivateCode(code).awaitFirstOrNull()?.let {
+            it.activateCode = String()
+            userRepo.save(it.copy(active = true)).awaitFirst()
         }
-        return user
+
     }
-    suspend fun findById(id:String): Mono<User> =userRepo.findById(id)
-    suspend fun findByEmail(email:String): User? =userRepo.findByEmail(email).awaitFirstOrNull()
+
+    suspend fun deleteUser(id: String) {
+        userRepo.findById(id).awaitFirstOrNull()?.let {
+            userRepo.save(it.copy(active = false))
+        }
+    }
+
+    suspend fun findById(id: String): Mono<User> = userRepo.findById(id)
+    suspend fun findByEmail(email: String): User? = userRepo.findByEmail(email).awaitFirstOrNull()
 }

@@ -5,8 +5,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "typeAnimal")
-data class AnimalType(
+data class AnimalSubspecies(
         @Id
         val id: ObjectId = ObjectId.get(),
-        var type:String
+        var type: String
 )
