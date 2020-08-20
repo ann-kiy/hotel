@@ -19,28 +19,31 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
     suspend fun addUser(userDTO: NewUser): User? {
         return userRepo.findByEmail(userDTO.email).awaitFirstOrNull()?.let {
             val user = userDTO.toUser()
-            user.roles = Collections.singleton(Role.USER)
-            user.activateCode = UUID.randomUUID().toString()
             //sendMessage(userFDB)
-            userRepo.save(user).awaitFirst()
+            userRepo.save(user.copy(
+                    roles = Collections.singleton(Role.USER),
+                    activateCode = UUID.randomUUID().toString())).awaitFirst()
         }
     }
 
-    suspend fun addFile(user: User, file: FilePart) {
-        user.img = fileStorageService.store(file)
-        userRepo.save(user).awaitFirst()
-    }
+    suspend fun addFile(user: User, file: FilePart) =
+            userRepo.save(user.copy(img = fileStorageService.store(file))).awaitFirst()
+
 
     suspend fun updateUser(userDTO: User, userId: String): User? {
         return userRepo.findById(userId).awaitFirstOrNull()
                 ?.let {
-                    it.name = userDTO.name
-                    it.locale = userDTO.locale
-                    it.phone = userDTO.phone
+
                     val isEmailChange = (it.email != userDTO.email) && userDTO.email.isNotEmpty()
                     if (isEmailChange) {
                         //sendMessage(userFDB)
-                        userRepo.save(it.copy(email = userDTO.email, activateCode = UUID.randomUUID().toString(), active = false)).awaitFirst()
+                        userRepo.save(it.copy(
+                                name = userDTO.name ,
+                                locale = userDTO.locale,
+                                phone = userDTO.phone,
+                                email = userDTO.email,
+                                activateCode = UUID.randomUUID().toString(),
+                                active = false)).awaitFirst()
                     }
                     userRepo.save(it).awaitFirst()
                 }
@@ -48,8 +51,9 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
 
     suspend fun activateUser(code: String): User? {
         return userRepo.findByActivateCode(code).awaitFirstOrNull()?.let {
-            it.activateCode = String()
-            userRepo.save(it.copy(active = true)).awaitFirst()
+            userRepo.save(it.copy(
+                    activateCode = UUID.randomUUID().toString(),
+                    active = true)).awaitFirst()
         }
 
     }

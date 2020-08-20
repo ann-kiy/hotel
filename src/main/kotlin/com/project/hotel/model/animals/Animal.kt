@@ -4,22 +4,25 @@ import com.project.hotel.model.Comment
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.Instant
 
 data class Animal(
         @Id
         val id: ObjectId = ObjectId.get(),
-        var userId: String,
-        var name: String,
-        var sex: Sex,
-        var typeId: String,
-        var breedId: String,
-        var age: Byte,
-        var img: String,
-        var info: String,
-        var rating: Float? = 0.0f,
-        var state: Boolean? = true,
-        var comments: List<Comment>? = arrayListOf()
-)
+        val userId: String,
+        val name: String,
+        val sex: Sex,
+        val typeId: String,
+        val breedId: String,
+        val age: Byte,
+        val img: String,
+        val info: String,
+        val rating: Float? = 0.0f,
+        val state: Boolean? = true,
+        val comments: List<Comment>? = arrayListOf()
+){
+        var createDate: Instant = Instant.now()
+}
 
 enum class Sex { m, f }
 

@@ -17,16 +17,17 @@ data class Advertisement(
         val userId: String,
         @Field("usr.locale")
         val userLocale: Locale,
-        var createDate: Instant,
-        var animalSubspecies: AnimalSubspecies? = null,
-        var breedType: AnimalBreed? = null,
-        var dateStart: Instant,
-        var dateEnd: Instant,
-        var condition: Condition,
-        var state: Boolean? = true,
-        var info: String? = null,
-        var age: Byte? = null,
-        var sex: Sex? = null
-)
+        val animalSubspecies: AnimalSubspecies? = null,
+        val breedType: AnimalBreed? = null,
+        val dateStart: Instant,
+        val dateEnd: Instant,
+        val condition: Condition,
+        val state: Boolean? = true,
+        val info: String? = null,
+        val age: Byte? = null,
+        val sex: Sex? = null
+){
+        var createDate: Instant= Instant.now()
+}
 
 enum class Condition { FREE_OF_CHARGE, FOR_REWARD, FOR_MONEY }

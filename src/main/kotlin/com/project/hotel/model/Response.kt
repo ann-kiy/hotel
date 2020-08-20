@@ -14,9 +14,10 @@ data class Response(
         val advertisementId: String,
         val animalId: String,
         val createdDate: Instant = Instant.now(),
-        var updateDate: Instant,
-        var state: Set<ResponseState>
-)
+        val state: Set<ResponseState> = emptySet()
+){
+    var updateDate: Instant = Instant.now()
+}
 
 enum class ResponseState {
     ACTIVE,

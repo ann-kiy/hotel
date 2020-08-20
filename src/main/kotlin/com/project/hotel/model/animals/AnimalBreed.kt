@@ -8,5 +8,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class AnimalBreed(
         @Id
         val id: ObjectId = ObjectId.get(),
-        var breed: String
+        val breed: String
 )

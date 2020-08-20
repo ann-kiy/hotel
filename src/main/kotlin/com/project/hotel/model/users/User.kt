@@ -12,17 +12,19 @@ data class User(
         @Id
         val id: ObjectId = ObjectId.get(),
         val webId: String? = null,
-        var name: String,
-        var img: String? = null,
+        val name: String,
         val email: String,
-        var phone: String,
-        var password: String,
-        var roles: Set<Role>? = null,
-        var rating: Float? = 0.0f,
-        val active: Boolean? = false,
-        var activateCode: String? = null,
-        var lastVisit: Instant? = null,
-        var locale: Locale,
-        var animals: List<Animal>? = arrayListOf()
-)
+        val phone: String,
+        val password: String,
+        val roles: Set<Role> = emptySet(),
+        val active: Boolean = false,
+        val activateCode: String? = null,
+        val img: String? = null,
+        val rating: Float? = 0.0f,
+        val locale: Locale,
+        val animals: List<Animal> = emptyList()
+) {
+    var lastVisit: Instant = Instant.now()
+
+}
 

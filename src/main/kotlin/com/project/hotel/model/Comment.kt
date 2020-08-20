@@ -8,11 +8,12 @@ import java.time.LocalDateTime
 @Document(collection = "comment")
 data class Comment(
         val id: ObjectId = ObjectId.get(),
-        var text: String,
+        val text: String,
         val authId: String,
         val recipientId: String,
-        var rating: Float,
-        var createDate: Instant,
-        var updateDate: Instant,
-        var state: Boolean? = true
-)
+        val rating: Float,
+        val createDate: Instant,
+        val state: Boolean? = true
+){
+    var updateDate: Instant= Instant.now()
+}
