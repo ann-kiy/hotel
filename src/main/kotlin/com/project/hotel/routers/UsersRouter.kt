@@ -21,21 +21,18 @@ class UsersRouter(private val userService: UserService) {
     fun userRouter() = coRouter {
         "/api/users".nest {
             POST("/") { request ->
-                val user = request.awaitBodyOrNull<NewUser>()
-                if (user != null) {
-                    try {
-                        userService.addUser(user)?.let {
-                            userService.sendMessage(it)
-                        }
-                        ServerResponse.ok().bodyValueAndAwait(user)
-                    } catch (e: org.springframework.dao.DuplicateKeyException) {
-                        ServerResponse.badRequest().buildAndAwait()
-                    } catch (e: Exception) {
-                        Logger.getLogger(HotelApplication::class.java.name).warning(e.toString())
-                        ServerResponse.badRequest().buildAndAwait()
+                try {
+                    val user = request.awaitBody<NewUser>()
+                    userService.addUser(user)?.let {
+                        userService.sendMessage(it)
                     }
-                } else
+                    ServerResponse.ok().bodyValueAndAwait(user)
+                } catch (e: org.springframework.dao.DuplicateKeyException) {
                     ServerResponse.badRequest().buildAndAwait()
+                } catch (e: Exception) {
+                    Logger.getLogger(HotelApplication::class.java.name).warning(e.toString())
+                    ServerResponse.badRequest().buildAndAwait()
+                }
             }
             POST("/file/{id}") {
                 val id = it.pathVariable("id")

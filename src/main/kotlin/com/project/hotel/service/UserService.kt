@@ -33,7 +33,7 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
     suspend fun updateUser(userDTO: User, userId: String): User? {
         return userRepo.findById(userId).awaitFirstOrNull()
                 ?.let {
-                    val isEmailChange = (it.email != userDTO.email) && userDTO.email.isNotEmpty()
+                    val isEmailChange = userDTO.email.isNotEmpty() && it.email != userDTO.email
                     val user = it.copy(
                             name = userDTO.name,
                             location = userDTO.location,
