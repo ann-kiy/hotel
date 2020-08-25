@@ -7,22 +7,22 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 data class Animal(
-        @Id
-        val id: ObjectId = ObjectId.get(),
         val userId: String,
         val name: String,
         val sex: Sex,
         val typeId: String,
         val breedId: String,
         val age: Byte,
-        val img: String,
+        val avatar: String,
         val info: String,
-        val rating: Float? = 0.0f,
-        val state: Boolean? = true,
-        val comments: List<Comment>? = arrayListOf()
+        val state: Boolean = true,
+        val comments: List<Comment> = emptyList<Comment>(),
+        @Id
+        val id: ObjectId = ObjectId.get()
 ){
         var createDate: Instant = Instant.now()
+        val rating: Float = 0.0f
 }
 
-enum class Sex { m, f }
+enum class Sex { M, F }
 

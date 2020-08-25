@@ -16,7 +16,6 @@ configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
-
 }
 
 repositories {
@@ -37,6 +36,8 @@ dependencies {
 	implementation("org.synchronoss.cloud:nio-multipart-parser:1.1.0")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.springframework.session:spring-session-core")
+	implementation("org.springframework.boot:spring-boot-starter-mail:2.3.3.RELEASE")
+
 	compileOnly("org.projectlombok:lombok")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:2.3.3.RELEASE")
 	annotationProcessor("org.projectlombok:lombok")

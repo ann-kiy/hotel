@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.logging.Logger
 
 @SpringBootApplication
-@EnableReactiveMongoRepositories
 class HotelApplication
 
 fun main(args: Array<String>) {

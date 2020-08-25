@@ -6,6 +6,7 @@ import com.project.hotel.model.users.User
 import com.project.hotel.repository.UserRepo
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitLast
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -14,45 +15,44 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class UserService(private val userRepo: UserRepo, private val fileStorageService: FileStorageService) {
+class UserService(private val userRepo: UserRepo, private val fileStorageService: FileStorageService, private val mailService: MailService) {
 
     suspend fun addUser(userDTO: NewUser): User? {
-        return userRepo.findByEmail(userDTO.email).awaitFirstOrNull()?.let {
             val user = userDTO.toUser()
-            //sendMessage(userFDB)
-            userRepo.save(user.copy(
-                    roles = Collections.singleton(Role.USER),
-                    activateCode = UUID.randomUUID().toString())).awaitFirst()
-        }
+             return userRepo.save(
+                     user.copy(
+                        roles = setOf(Role.USER),
+                        activateCode = UUID.randomUUID().toString())).awaitLast()
+
     }
 
     suspend fun addFile(user: User, file: FilePart) =
-            userRepo.save(user.copy(img = fileStorageService.store(file))).awaitFirst()
+            userRepo.save(user.copy(avatar = fileStorageService.uploadFile(file))).awaitFirst()
 
 
     suspend fun updateUser(userDTO: User, userId: String): User? {
         return userRepo.findById(userId).awaitFirstOrNull()
                 ?.let {
-
                     val isEmailChange = (it.email != userDTO.email) && userDTO.email.isNotEmpty()
+                    val user = it.copy(
+                            name = userDTO.name,
+                            location = userDTO.location,
+                            phone = userDTO.phone)
                     if (isEmailChange) {
-                        //sendMessage(userFDB)
-                        userRepo.save(it.copy(
-                                name = userDTO.name ,
-                                locale = userDTO.locale,
-                                phone = userDTO.phone,
+                        userRepo.save(user.copy(
                                 email = userDTO.email,
                                 activateCode = UUID.randomUUID().toString(),
                                 active = false)).awaitFirst()
                     }
-                    userRepo.save(it).awaitFirst()
+                    sendMessage(user)
+                    userRepo.save(user).awaitFirst()
                 }
     }
 
     suspend fun activateUser(code: String): User? {
         return userRepo.findByActivateCode(code).awaitFirstOrNull()?.let {
             userRepo.save(it.copy(
-                    activateCode = UUID.randomUUID().toString(),
+                    activateCode = null,
                     active = true)).awaitFirst()
         }
 
@@ -64,6 +64,14 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
         }
     }
 
-    suspend fun findById(id: String): Mono<User> = userRepo.findById(id)
+    fun sendMessage(user: User) {
+        val message = String.format("Hello, %s\n" +
+                "Welcome to HotelAnimals. Please, visit next link: http://localhost:8080/activate/%s",
+                user.name,
+                user.activateCode)
+        mailService.sent(user.email, "Activation code", message)
+    }
+
+    fun findById(id: String): Mono<User> = userRepo.findById(id)
     suspend fun findByEmail(email: String): User? = userRepo.findByEmail(email).awaitFirstOrNull()
 }

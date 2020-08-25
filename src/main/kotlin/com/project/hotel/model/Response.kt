@@ -8,13 +8,13 @@ import java.time.LocalDateTime
 
 @Document(collection = "response")
 data class Response(
-        @Id
-        val id: ObjectId = ObjectId.get(),
         val userId: String,
         val advertisementId: String,
         val animalId: String,
         val createdDate: Instant = Instant.now(),
-        val state: Set<ResponseState> = emptySet()
+        val state: Set<ResponseState> = emptySet(),
+        @Id
+        val id: ObjectId = ObjectId.get()
 ){
     var updateDate: Instant = Instant.now()
 }
