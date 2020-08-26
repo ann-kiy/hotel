@@ -8,6 +8,7 @@ import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitLast
 import org.springframework.http.codec.multipart.FilePart
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.time.Instant
@@ -15,12 +16,16 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class UserService(private val userRepo: UserRepo, private val fileStorageService: FileStorageService, private val mailService: MailService) {
+class UserService(private val userRepo: UserRepo,
+                  private val fileStorageService: FileStorageService,
+                  private val mailService: MailService,
+                    private val passwordEncoder: PasswordEncoder) {
 
     suspend fun addUser(userDTO: NewUser): User? {
             val user = userDTO.toUser()
              return userRepo.save(
                      user.copy(
+                        password = passwordEncoder.encode(user.password),
                         roles = setOf(Role.USER),
                         activateCode = UUID.randomUUID().toString())).awaitLast()
 

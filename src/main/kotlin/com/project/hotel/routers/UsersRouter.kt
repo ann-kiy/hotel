@@ -22,11 +22,15 @@ class UsersRouter(private val userService: UserService) {
         "/api/users".nest {
             POST("/") { request ->
                 try {
-                    val user = request.awaitBody<NewUser>()
-                    userService.addUser(user)?.let {
-                        userService.sendMessage(it)
+                    val user = request.awaitBodyOrNull<NewUser>()
+                    if(user!=null) {
+                        userService.addUser(user)?.let {
+                            userService.sendMessage(it)
+                        }
+                        ServerResponse.ok().buildAndAwait()
+                    }else{
+                        ServerResponse.badRequest().buildAndAwait()
                     }
-                    ServerResponse.ok().bodyValueAndAwait(user)
                 } catch (e: org.springframework.dao.DuplicateKeyException) {
                     ServerResponse.badRequest().buildAndAwait()
                 } catch (e: Exception) {

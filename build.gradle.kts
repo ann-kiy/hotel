@@ -26,6 +26,8 @@ repositories {
 
 dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+	implementation("org.springframework.security:spring-security-core")
+//	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
