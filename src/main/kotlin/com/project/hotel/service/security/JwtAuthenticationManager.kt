@@ -9,9 +9,10 @@ import reactor.core.publisher.Mono
 
 @Component
 class JwtAuthenticationManager(private val jwtSigner: JwtService) : ReactiveAuthenticationManager {
+    @Override
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         return Mono.just(authentication)
-                .map { jwtSigner.validateJwt(it.credentials as String) }
+                .map { jwtSigner.validateJwt(it.principal as String) }
                 .onErrorResume { Mono.empty() }
                 .map { jws ->
                     UsernamePasswordAuthenticationToken(

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class AuthService(private val userRepo: UserRepo, private val passwordEncoder: PasswordEncoder, private val jwtService: JwtService) {
-    suspend fun loginUser(authUser: AuthUser): String? {
+    suspend fun createJWT(authUser: AuthUser): String? {
         return userRepo.findByEmail(authUser.email)
-                .filter { passwordEncoder.matches(authUser.password, it.password) }
+                .filter { passwordEncoder.matches(authUser.password, it.password) && it.active==DataState.ACTIVE }
                 .map { jwtService.createJwt(it.email) }
                 .awaitFirstOrNull()
     }

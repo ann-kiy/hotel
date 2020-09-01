@@ -24,8 +24,8 @@ import java.util.logging.Logger
 class UsersRouter(private val userService: UserService, private val authService: AuthService) {
     @Bean
     fun userRouter() = coRouter {
-        "/api/users".nest {
-            POST("/") { request ->
+        "/api".nest {
+            POST("/user") { request ->
                 try {
                     val user = request.awaitBodyOrNull<NewUser>()
                     if (user != null) {
@@ -46,19 +46,34 @@ class UsersRouter(private val userService: UserService, private val authService:
             POST("/auth") { request ->
                 val user = request.awaitBodyOrNull<AuthUser>()
                 if (user != null) {
-                    val jwt = authService.loginUser(user)
-                    val authCookie = ResponseCookie.fromClientResponse("X-Auth", jwt!!)
-                            .maxAge(3600)
-                            .httpOnly(true)
-                            .path("/")
-                            .secure(false)
-                            .build()
-                    ServerResponse.noContent().cookie(authCookie).buildAndAwait()
+                    val jwt = authService.createJWT(user)
+                    if (jwt != null) {
+                        val authCookie = ResponseCookie.fromClientResponse("X-Auth", jwt!!)
+                                .maxAge(3600)
+                                .httpOnly(true)
+                                .path("/")
+                                .secure(false)
+                                .build()
+                        ServerResponse.noContent().cookie(authCookie).buildAndAwait()
+                    } else {
+                        ServerResponse.status(HttpStatus.UNAUTHORIZED).buildAndAwait()
+                    }
                 } else {
                     ServerResponse.status(HttpStatus.UNAUTHORIZED).buildAndAwait()
                 }
             }
+            POST("/logout") { request ->
+                request.cookies().remove("X-Auth")
+                ServerResponse.status(HttpStatus.UNAUTHORIZED).buildAndAwait()
+                }
 
+            POST("/activate/{code}") {
+                val code = it.pathVariable("code")
+                if (userService.activateUser(code) != null) {
+                    ServerResponse.ok().buildAndAwait()
+                } else
+                    ServerResponse.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).buildAndAwait()
+            }
             POST("/file/{id}") {
                 val id = it.pathVariable("id")
                 val file = it.awaitMultipartData().get("photo")?.get(0) as FilePart
