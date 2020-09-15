@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
+import org.springframework.session.data.mongo.config.annotation.web.reactive.EnableMongoWebSession
 
 @Configuration
 @EnableReactiveMethodSecurity
@@ -33,12 +34,15 @@ class SecurityConfiguration {
         val authenticationWebFilter = AuthenticationWebFilter(jwtAuthenticationManager)
         authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationConverter)
 
-        return http.authorizeExchange()
-                .pathMatchers("/api/auth", "/api/user", "/api/activate/**")
-                    .permitAll()
-                .pathMatchers("/user")
-                    .authenticated()
+        return http
+                .authorizeExchange()
+                .pathMatchers("/api/auth", "/api/user", "/api/activate/**", "/api/refresh")
+                    .permitAll().anyExchange()
+                    .authenticated().and()
+                .formLogin()
+                .loginPage("/api/auth")
                 .and()
+                .authenticationManager(jwtAuthenticationManager)
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic()
                 .disable()

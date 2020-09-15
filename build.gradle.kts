@@ -38,12 +38,13 @@ dependencies {
 	implementation("org.synchronoss.cloud:nio-multipart-parser:1.1.0")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.springframework.session:spring-session-core")
+	implementation ("org.springframework.session:spring-session-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.3.3.RELEASE")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.1")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.1")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.1")
 
-	compileOnly("org.projectlombok:lombok")
+//	compileOnly("org.projectlombok:lombok")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:2.3.3.RELEASE")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {

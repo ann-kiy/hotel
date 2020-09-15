@@ -13,20 +13,30 @@ import java.util.*
 
 @Service
 class JwtService {
-    val keyPair: KeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256)
+    val keyAccessPair: KeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256)
+    val keyRefrechPair: KeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256)
 
-    fun createJwt(userId: String): String {
+    fun createAcсessJwt(data: String): String {
         return Jwts.builder()
-                .signWith(keyPair.private, SignatureAlgorithm.RS256)
-                .setSubject(userId)
+                .signWith(keyAccessPair.private, SignatureAlgorithm.RS256)
+                .setSubject(data)
+                .setIssuer("identity")
+                .setExpiration(Date.from(Instant.now().plus(Duration.ofMinutes(5))))
+                .setIssuedAt(Date.from(Instant.now()))
+                .compact()
+    }
+    fun createRefreshJwt(data: String): String {
+        return Jwts.builder()
+                .signWith(keyRefrechPair.private, SignatureAlgorithm.RS256)
+                .setSubject(data+Instant.now().toString())
                 .setIssuer("identity")
                 .setExpiration(Date.from(Instant.now().plus(Duration.ofMinutes(30))))
                 .setIssuedAt(Date.from(Instant.now()))
                 .compact()
     }
-    fun validateJwt(jwt: String): Jws<Claims> {
+    fun validateJwt(jwt: String, key: KeyPair): Jws<Claims> {
         return Jwts.parserBuilder()
-                .setSigningKey(keyPair.public)
+                .setSigningKey(key.public)
                 .build()
                 .parseClaimsJws(jwt)
     }

@@ -12,7 +12,7 @@ class JwtAuthenticationManager(private val jwtSigner: JwtService) : ReactiveAuth
     @Override
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         return Mono.just(authentication)
-                .map { jwtSigner.validateJwt(it.principal as String) }
+                .map { jwtSigner.validateJwt(it.principal as String, jwtSigner.keyAccessPair) }
                 .onErrorResume { Mono.empty() }
                 .map { jws ->
                     UsernamePasswordAuthenticationToken(
