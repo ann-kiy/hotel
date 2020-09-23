@@ -27,24 +27,24 @@ class UsersRouter(private val userService: UserService, private val authService:
     @Bean
     fun userRouter() = coRouter {
         "/api".nest {
-            POST("/user") { request ->
-                try {
-                    val user = request.awaitBodyOrNull<NewUser>()
-                    if (user != null) {
-                        userService.addUser(user)?.let {
-                            userService.sendMessage(it)
-                        }
-                        ServerResponse.ok().buildAndAwait()
-                    } else {
-                        ServerResponse.badRequest().buildAndAwait()
-                    }
-                } catch (e: org.springframework.dao.DuplicateKeyException) {
-                    ServerResponse.badRequest().buildAndAwait()
-                } catch (e: Exception) {
-                    Logger.getLogger(HotelApplication::class.java.name).warning(e.toString())
-                    ServerResponse.badRequest().buildAndAwait()
-                }
-            }
+//            POST("/user") { request ->
+//                try {
+//                    val user = request.awaitBodyOrNull<NewUser>()
+//                    if (user != null) {
+//                        userService.addUser(user)?.let {
+//                            userService.sendMessage(it)
+//                        }
+//                        ServerResponse.ok().buildAndAwait()
+//                    } else {
+//                        ServerResponse.badRequest().buildAndAwait()
+//                    }
+//                } catch (e: org.springframework.dao.DuplicateKeyException) {
+//                    ServerResponse.badRequest().buildAndAwait()
+//                } catch (e: Exception) {
+//                    Logger.getLogger(HotelApplication::class.java.name).warning(e.toString())
+//                    ServerResponse.badRequest().buildAndAwait()
+//                }
+//            }
             POST("/auth") { request ->
                 val user = request.awaitBodyOrNull<AuthUser>()
                 if (user != null) {
@@ -64,6 +64,8 @@ class UsersRouter(private val userService: UserService, private val authService:
                     ServerResponse.status(HttpStatus.UNAUTHORIZED).buildAndAwait()
                 }
             }
+            POST("/user") {
+                    ServerResponse.status(HttpStatus.ACCEPTED).bodyValueAndAwait("fghj")            }
             POST("/refresh") { request ->
                 val token = request.awaitBody<String>()
                 val session = authService.refresh(token)

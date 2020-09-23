@@ -36,14 +36,14 @@ class SecurityConfiguration {
 
         return http
                 .authorizeExchange()
-                .pathMatchers("/api/auth", "/api/user", "/api/activate/**", "/api/refresh")
-                    .permitAll().anyExchange()
+                .pathMatchers("/api/auth", "/api/activate/**", "/api/refresh")
+                    .permitAll()
+                .pathMatchers("/api/user")
                     .authenticated().and()
+                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .formLogin()
                 .loginPage("/api/auth")
                 .and()
-                .authenticationManager(jwtAuthenticationManager)
-                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic()
                 .disable()
                 .csrf()

@@ -20,8 +20,7 @@ import java.util.*
 class UserService(private val userRepo: UserRepo,
                   private val fileStorageService: FileStorageService,
                   private val mailService: MailService,
-                    private val passwordEncoder: PasswordEncoder,
-                    private val jwtService: JwtService) {
+                    private val passwordEncoder: PasswordEncoder) {
 
     suspend fun addUser(userDTO: NewUser): User? {
             val user = userDTO.toUser()
