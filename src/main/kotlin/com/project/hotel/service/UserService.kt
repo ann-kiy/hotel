@@ -1,26 +1,32 @@
 package com.project.hotel.service
 
+import com.project.hotel.model.dto.AuthUser
 import com.project.hotel.model.dto.NewUser
 import com.project.hotel.model.users.Role
 import com.project.hotel.model.users.User
 import com.project.hotel.repository.UserRepo
+import com.project.hotel.service.security.JwtService
+import com.project.hotel.util.DataState
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitLast
 import org.springframework.http.codec.multipart.FilePart
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.time.Instant
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class UserService(private val userRepo: UserRepo, private val fileStorageService: FileStorageService, private val mailService: MailService) {
+class UserService(private val userRepo: UserRepo,
+                  private val fileStorageService: FileStorageService,
+                  private val mailService: MailService,
+                    private val passwordEncoder: PasswordEncoder) {
 
     suspend fun addUser(userDTO: NewUser): User? {
             val user = userDTO.toUser()
              return userRepo.save(
                      user.copy(
+                        password = passwordEncoder.encode(user.password),
                         roles = setOf(Role.USER),
                         activateCode = UUID.randomUUID().toString())).awaitLast()
 
@@ -42,7 +48,7 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
                         userRepo.save(user.copy(
                                 email = userDTO.email,
                                 activateCode = UUID.randomUUID().toString(),
-                                active = false)).awaitFirst()
+                                active = DataState.NOT_ACTIVE)).awaitFirst()
                     }
                     sendMessage(user)
                     userRepo.save(user).awaitFirst()
@@ -53,14 +59,14 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
         return userRepo.findByActivateCode(code).awaitFirstOrNull()?.let {
             userRepo.save(it.copy(
                     activateCode = null,
-                    active = true)).awaitFirst()
+                    active = DataState.ACTIVE)).awaitFirst()
         }
 
     }
 
     suspend fun deleteUser(id: String) {
         userRepo.findById(id).awaitFirstOrNull()?.let {
-            userRepo.save(it.copy(active = false))
+            userRepo.save(it.copy(active = DataState.NOT_ACTIVE))
         }
     }
 
@@ -71,7 +77,7 @@ class UserService(private val userRepo: UserRepo, private val fileStorageService
                 user.activateCode)
         mailService.sent(user.email, "Activation code", message)
     }
-
+    suspend fun isActivate(email:String):DataState?=userRepo.findByEmail(email).awaitFirstOrNull()?.let{return it.active}
     fun findById(id: String): Mono<User> = userRepo.findById(id)
     suspend fun findByEmail(email: String): User? = userRepo.findByEmail(email).awaitFirstOrNull()
 }

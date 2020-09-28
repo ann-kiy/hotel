@@ -1,6 +1,7 @@
 package com.project.hotel.model.users
 
 import com.project.hotel.model.animals.Animal
+import com.project.hotel.util.DataState
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
@@ -16,7 +17,7 @@ data class User(
         val password: String,
         val roles: Set<Role> = emptySet(),
         val provider: Provider = Provider.LOCAL,
-        val active: Boolean = false,
+        val active: DataState = DataState.NOT_ACTIVE,
         val activateCode: String? = null,
         val avatar: String? = null,
         val location: Location,
@@ -24,7 +25,7 @@ data class User(
         @Id
         val id: ObjectId = ObjectId.get()
 ) {
-    val rating: Float = 0.0f
+    var rating: Double = 0.0
     var lastVisit: Instant = Instant.now()
 }
 enum class Provider{
