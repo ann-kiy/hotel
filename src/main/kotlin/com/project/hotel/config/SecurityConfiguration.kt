@@ -36,9 +36,9 @@ class SecurityConfiguration {
 
         return http
                 .authorizeExchange()
-                .pathMatchers("/api/auth", "/api/activate/**", "/api/refresh")
+                .pathMatchers("/api/auth", "/api/activate/**", "/api/refresh", "/api/registration")
                     .permitAll()
-                .pathMatchers("/api/user")
+                .pathMatchers("/api/user", "/api/animal/**")
                     .authenticated().and()
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .formLogin()
