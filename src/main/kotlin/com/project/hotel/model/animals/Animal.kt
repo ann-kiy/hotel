@@ -19,11 +19,11 @@ data class Animal(
         val dateOfBirth: Date,
         val avatar: String,
         val info: String,
-        val state: Boolean = true,
         @Id
         val id: ObjectId = ObjectId.get()
 ){
         var createDate: Instant = Instant.now()
+        var state: Boolean = true
         var rating: Float = 0.0f
         var countComment:Int = 0
 }

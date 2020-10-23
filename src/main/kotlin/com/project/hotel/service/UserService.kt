@@ -1,5 +1,6 @@
 package com.project.hotel.service
 
+import com.project.hotel.model.Comment
 import com.project.hotel.model.dto.AuthUser
 import com.project.hotel.model.dto.NewUser
 import com.project.hotel.model.users.Role
@@ -76,6 +77,27 @@ class UserService(private val userRepo: UserRepo,
                 user.name,
                 user.activateCode)
         mailService.sent(user.email, "Activation code", message)
+    }
+    suspend fun updateRating(userId: String, rating: Float):Float{
+        userRepo.findById(userId).awaitFirstOrNull()?.let{
+            val amount = (it.rating * it.countComment) + rating
+            it.rating = amount / (it.countComment + 1)
+            it.countComment++
+            userRepo.save(it)
+            return it.rating
+        }
+        return Float.NaN
+    }
+    suspend fun cancelRating(userId: String, rating: Float):Float{
+        userRepo.findById(userId).awaitFirstOrNull()?.let{
+            if(it.rating>=rating && it.countComment>0) {
+                it.rating -= rating
+                it.countComment--
+                userRepo.save(it)
+                return it.rating
+            }
+        }
+        return Float.NaN
     }
     suspend fun isActivate(email:String):DataState?=userRepo.findByEmail(email).awaitFirstOrNull()?.let{return it.active}
     fun findById(id: String): Mono<User> = userRepo.findById(id)

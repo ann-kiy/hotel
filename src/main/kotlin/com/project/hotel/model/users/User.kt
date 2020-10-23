@@ -25,7 +25,8 @@ data class User(
         @Id
         val id: ObjectId = ObjectId.get()
 ) {
-    var rating: Double = 0.0
+    var rating: Float = 0.0f
+    var countComment:Int = 0
     var lastVisit: Instant = Instant.now()
 }
 enum class Provider{

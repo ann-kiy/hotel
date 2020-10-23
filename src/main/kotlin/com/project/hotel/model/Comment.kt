@@ -13,9 +13,9 @@ data class Comment(
         val recipientId: String,
         val rating: Float,
         val createDate: Instant,
-        val state: Boolean = true,
         @Id
         val id: ObjectId = ObjectId.get()
 ){
     var updateDate: Instant= Instant.now()
+    var state: Boolean = true
 }

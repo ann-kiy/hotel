@@ -15,7 +15,8 @@ class AnimalService(val animalRepo: AnimalRepo) {
 
     suspend fun delete(animalId:String){
         animalRepo.findById(animalId).awaitFirstOrNull()?.let {
-            animalRepo.save(it.copy(state = false)).awaitFirst()
+            it.state = false
+            animalRepo.save(it).awaitFirst()
         }
 
     }
@@ -40,4 +41,16 @@ class AnimalService(val animalRepo: AnimalRepo) {
         }
         return Float.NaN
     }
+    suspend fun cancelRating(animalId: String, rating: Float):Float{
+        animalRepo.findById(animalId).awaitFirstOrNull()?.let{
+            if(it.rating>=rating && it.countComment>0) {
+                it.rating -= rating
+                it.countComment--
+                animalRepo.save(it)
+                return it.rating
+            }
+        }
+        return Float.NaN
+    }
+    suspend fun getByUser(userId:String)=animalRepo.findByUserId(userId).awaitFirstOrNull()
 }
