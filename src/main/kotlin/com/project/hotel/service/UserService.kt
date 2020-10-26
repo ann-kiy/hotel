@@ -21,12 +21,12 @@ import java.util.*
 class UserService(private val userRepo: UserRepo,
                   private val fileStorageService: FileStorageService,
                   private val mailService: MailService,
-                    private val passwordEncoder: PasswordEncoder) {
+                  private val passwordEncoder: PasswordEncoder) {
 
     suspend fun addUser(userDTO: NewUser): User? {
-            val user = userDTO.toUser()
-             return userRepo.save(
-                     user.copy(
+        val user = userDTO.toUser()
+        return userRepo.save(
+                user.copy(
                         password = passwordEncoder.encode(user.password),
                         roles = setOf(Role.USER),
                         activateCode = UUID.randomUUID().toString())).awaitLast()
@@ -78,28 +78,30 @@ class UserService(private val userRepo: UserRepo,
                 user.activateCode)
         mailService.sent(user.email, "Activation code", message)
     }
-    suspend fun updateRating(userId: String, rating: Float):Float{
-        userRepo.findById(userId).awaitFirstOrNull()?.let{
+
+    suspend fun updateRating(animalId: String, rating: Float): Float {
+        userRepo.findById(animalId).awaitFirstOrNull()?.let {
             val amount = (it.rating * it.countComment) + rating
-            it.rating = amount / (it.countComment + 1)
-            it.countComment++
-            userRepo.save(it)
+            it.rating = amount / ++it.countComment
+            userRepo.save(it).awaitFirstOrNull()
             return it.rating
         }
         return Float.NaN
     }
-    suspend fun cancelRating(userId: String, rating: Float):Float{
-        userRepo.findById(userId).awaitFirstOrNull()?.let{
-            if(it.rating>=rating && it.countComment>0) {
-                it.rating -= rating
-                it.countComment--
-                userRepo.save(it)
+
+    suspend fun cancelRating(animalId: String, rating: Float): Float {
+        userRepo.findById(animalId).awaitFirstOrNull()?.let {
+            if (it.countComment > 0) {
+                val amount = (it.rating * it.countComment) - rating
+                it.rating = amount / --it.countComment
+                userRepo.save(it).awaitFirstOrNull()
                 return it.rating
             }
         }
         return Float.NaN
     }
-    suspend fun isActivate(email:String):DataState?=userRepo.findByEmail(email).awaitFirstOrNull()?.let{return it.active}
-    fun findById(id: String): Mono<User> = userRepo.findById(id)
+
+    suspend fun isActivate(email: String): DataState? = userRepo.findByEmail(email).awaitFirstOrNull()?.let { return it.active }
+    fun findById(id: String): Mono<User?> = userRepo.findById(id)
     suspend fun findByEmail(email: String): User? = userRepo.findByEmail(email).awaitFirstOrNull()
 }

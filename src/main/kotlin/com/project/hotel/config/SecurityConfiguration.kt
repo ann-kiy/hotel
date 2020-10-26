@@ -35,8 +35,10 @@ class SecurityConfiguration {
         authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationConverter)
 
         return http
+
                 .authorizeExchange()
-                .pathMatchers("/api/auth", "/api/activate/**", "/api/refresh", "/api/registration")
+                .pathMatchers("/**")
+//                .pathMatchers("/api/auth", "/api/activate/**", "/api/refresh", "/api/registration")
                     .permitAll()
                 .pathMatchers("/api/user", "/api/animal/**")
                     .authenticated().and()

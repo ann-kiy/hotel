@@ -10,9 +10,9 @@ import java.time.Duration
 @Configuration
 @EnableMongoWebSession
 class SessionConfig {
-    @Bean
-    fun jdkMongoSessionConverter(): JdkMongoSessionConverter? {
-        return JdkMongoSessionConverter(Duration.ofMinutes(30))
-    }
+//    @Bean
+//    fun jdkMongoSessionConverter(): JdkMongoSessionConverter? {
+//        return JdkMongoSessionConverter(Duration.ofMinutes(30))
+//    }
 
 }

@@ -10,9 +10,9 @@ import org.springframework.http.ResponseCookie
 import org.springframework.web.reactive.function.server.*
 
 @Configuration
-class AnimallRouter(private val animalService: AnimalService) {
+class AnimalRouter(private val animalService: AnimalService) {
     @Bean
-    fun animalsRouter()= coRouter {
+    fun animalsRouter() = coRouter {
         "/api/animal".nest {
             POST("/") { request ->
                 val animal = request.awaitBodyOrNull<Animal>()
@@ -24,7 +24,7 @@ class AnimallRouter(private val animalService: AnimalService) {
                 }
             }
             DELETE("/{id}") { request ->
-                val animalId:String = request.pathVariable("id")
+                val animalId: String = request.pathVariable("id")
                 if (animalId.isNotEmpty()) {
                     animalService.delete(animalId)
                     ServerResponse.ok().buildAndAwait()
@@ -33,10 +33,10 @@ class AnimallRouter(private val animalService: AnimalService) {
                 }
             }
             PUT("/{id}") { request ->
-                val animalId:String = request.pathVariable("id")
-                val updateAnimal=request.awaitBodyOrNull<Animal>()
-                if (animalId.isNotEmpty() && updateAnimal!=null) {
-                    animalService.update(animalId,updateAnimal)
+                val animalId: String = request.pathVariable("id")
+                val updateAnimal = request.awaitBodyOrNull<Animal>()
+                if (animalId.isNotEmpty() && updateAnimal != null) {
+                    animalService.update(animalId, updateAnimal)
                     ServerResponse.ok().buildAndAwait()
                 } else {
                     ServerResponse.status(HttpStatus.BAD_REQUEST).buildAndAwait()
