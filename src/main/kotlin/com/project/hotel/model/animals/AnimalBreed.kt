@@ -8,5 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class AnimalBreed(
         @Id
         val id: ObjectId = ObjectId.get(),
+        val subspeciesId: String,
         val breed: String
 )

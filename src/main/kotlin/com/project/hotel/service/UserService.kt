@@ -3,6 +3,7 @@ package com.project.hotel.service
 import com.project.hotel.model.Comment
 import com.project.hotel.model.dto.AuthUser
 import com.project.hotel.model.dto.NewUser
+import com.project.hotel.model.users.Location
 import com.project.hotel.model.users.Role
 import com.project.hotel.model.users.User
 import com.project.hotel.repository.UserRepo
@@ -21,7 +22,8 @@ import java.util.*
 class UserService(private val userRepo: UserRepo,
                   private val fileStorageService: FileStorageService,
                   private val mailService: MailService,
-                  private val passwordEncoder: PasswordEncoder) {
+                  private val passwordEncoder: PasswordEncoder,
+                  private val advertisementService: AdvertisementService) {
 
     suspend fun addUser(userDTO: NewUser): User? {
         val user = userDTO.toUser()
@@ -52,6 +54,8 @@ class UserService(private val userRepo: UserRepo,
                                 active = DataState.NOT_ACTIVE)).awaitFirst()
                     }
                     sendMessage(user)
+                    if(it.location == userDTO.location)
+                        advertisementService.updateLocation(userId,userDTO.location)
                     userRepo.save(user).awaitFirst()
                 }
     }
@@ -101,7 +105,13 @@ class UserService(private val userRepo: UserRepo,
         return Float.NaN
     }
 
+    suspend fun updateAdvertisement(userId: String, newLocation: Location){
+        advertisementService.updateLocation(userId, newLocation)
+    }
     suspend fun isActivate(email: String): DataState? = userRepo.findByEmail(email).awaitFirstOrNull()?.let { return it.active }
-    fun findById(id: String): Mono<User?> = userRepo.findById(id)
+    fun findById(id: String): Mono<User> = userRepo.findById(id)
     suspend fun findByEmail(email: String): User? = userRepo.findByEmail(email).awaitFirstOrNull()
+    suspend fun getLocation(id: String)=userRepo.findById(id).awaitFirstOrNull()?.location
+    suspend fun contains(id: String): Boolean =userRepo.existsById(id).awaitFirst()
+
 }

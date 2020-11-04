@@ -9,4 +9,11 @@ data class Location(
         val street: String,
         val house: String? = null,
         val metro: String? = null
-)
+){
+    fun equals(other: Any?): Boolean{
+        if (other != null) {
+            return this.lat == (other as Location).lat && this.lng == other.lng
+        }
+        return false
+    }
+}

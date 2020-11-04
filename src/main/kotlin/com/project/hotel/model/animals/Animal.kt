@@ -13,7 +13,7 @@ data class Animal(
         val userId: String,
         val name: String,
         val sex: Sex,
-        val typeId: String,
+        val subspeciesId: String,
         val breedId: String,
         @JsonFormat(pattern="dd.MM.yyyy")
         val dateOfBirth: Date,

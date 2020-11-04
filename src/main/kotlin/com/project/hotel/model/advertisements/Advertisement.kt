@@ -1,5 +1,6 @@
 package com.project.hotel.model.advertisements
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.project.hotel.model.animals.AnimalBreed
 import com.project.hotel.model.animals.AnimalSubspecies
 import com.project.hotel.model.animals.Sex
@@ -14,13 +15,14 @@ import java.time.Instant
 data class Advertisement(
         val userId: String,
         @Field("usr.locale")
-        val userLocation: Location,
-        val animalSubspecies: AnimalSubspecies? = null,
-        val breedType: AnimalBreed? = null,
+        val userLocation: Location?=null,
+        val subspeciesId: String? = null,
+        val breedId: String? = null,
+        @JsonFormat(pattern="dd.MM.yyyy")
         val dateStart: Instant,
+        @JsonFormat(pattern="dd.MM.yyyy")
         val dateEnd: Instant,
         val condition: Condition,
-        val state: Boolean = true,
         val info: String? = null,
         val age: Int? = null,
         val sex: Sex? = null,
@@ -28,6 +30,7 @@ data class Advertisement(
         val id: ObjectId = ObjectId.get()
 ){
         var createDate: Instant= Instant.now()
+        var state: Boolean = true
 }
 
 enum class Condition { FREE_OF_CHARGE, FOR_REWARD, FOR_MONEY }
